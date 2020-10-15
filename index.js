@@ -4,7 +4,6 @@ const moment = require('moment-timezone');
 const config = require('./config.json');
 moment().tz('America/Vancouver').format();
 moment.tz.setDefault('America/Vancouver');
-const curtime = moment().tz('America/Vancouver');
 
 async function pullQuery() {
 	let con = mysql.createConnection({
@@ -48,7 +47,7 @@ async function updateMessage(classes, assignments) {
 		Object.keys(assignments).forEach(function(keyAsn) {
 			const rowAsn = assignments[keyAsn];
 			if (rowAsn.classID == rowCl.classID) {
-				if (moment(rowAsn.dueDate).isBefore() && moment(rowAsn.dueDate).diff(curtime, 'weeks') < 2) {
+				if (moment(rowAsn.dueDate).isBefore() && moment(rowAsn.dueDate).diff(moment(), 'weeks') < 2) {
 					assignmentsLateString += '- ' + rowAsn.assignmentName + ' `' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ')`\n';
 				}
 			}
@@ -80,7 +79,7 @@ async function updateMessage(classes, assignments) {
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isAfter()) {
 					assignmentsString += '- ' +
-						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(curtime, 'days') < 2) ? '⌛' : '') : 'Weekly') + '`\n';
+						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? '⌛' : '') : 'Weekly') + '`\n';
 				}
 			}
 		});
