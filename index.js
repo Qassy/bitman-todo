@@ -37,7 +37,6 @@ async function pullQuery() {
 const client = new Discord.Client();
 
 async function updateMessage(classes, assignments) {
-	//14286610
 	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
 	var embedObj = JSON.parse(embedString);
 
@@ -90,22 +89,16 @@ async function updateMessage(classes, assignments) {
 			name: rowCl.classID,
 			value: assignmentsString,
 		});
-
-		//console.log(assignmentsString);
 	});
 
 	embedString = JSON.stringify(embedObj);
-	//console.log(embedString);
-	//console.log(embedObj);
 
 	Object.keys(classes).forEach(function(key) {
 		const row = classes[key];
-		//console.log(row.classID);
 	});
 
 	const embed = embedObj;
 	const channel = client.channels.cache.get(config.listchannelid);
-	//channel.send('test automessage');
 
 	channel.messages.fetch(config.listmsgid)
 		.then(msg => msg.edit('', { embed }))
@@ -116,7 +109,6 @@ client.once('ready', () => {
 	console.log('Ready!');
 	//const channel = client.channels.cache.get('754007715335897119');
 	//channel.send('beep boop task list goes here');
-	//updateMessage();
 	pullQuery();
 	loop();
 });
@@ -126,11 +118,11 @@ let active = true;
 function loop() {
 	if (active == true) {
 		setTimeout(function() {
-			//console.log("hi");
 			pullQuery();
 			loop();
 		}, 60000);
 	}
 }
 
+// login client to discord
 client.login(config.token);
