@@ -108,6 +108,7 @@ async function updateMessage(classes, assignments) {
 
 client.once('ready', () => {
 	console.log('Ready!');
+	client.user.setActivity('garysucks.ca', { type: 'WATCHING' });
 	//const channel = client.channels.cache.get('754007715335897119');
 	//channel.send('beep boop task list goes here');
 	pullQuery();
