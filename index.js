@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment');
 const config = require('./config.json');
-moment().format();
+moment().tz('America/Vancouver').format();
 
 async function pullQuery() {
 	let con = mysql.createConnection({
