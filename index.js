@@ -14,7 +14,7 @@ async function pullQuery() {
 
 	con.connect(function(err) {
 		if (err) throw err;
-		console.log('Connected to database.');
+		//	console.log('Connected to database.');
 
 		const sqlC = 'SELECT * FROM classes';
 		const sqlA = 'SELECT * FROM assignments ORDER BY dueDate ASC';
