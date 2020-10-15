@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment');
-moment().format();
 const config = require('./config.json');
+moment().format();
 
 async function pullQuery() {
 	let con = mysql.createConnection({
