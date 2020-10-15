@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
-moment().tz('America/Vancouver').format();
+const curtime = moment().tz('America/Vancouver');
 
 async function pullQuery() {
 	let con = mysql.createConnection({
@@ -37,7 +37,7 @@ async function pullQuery() {
 const client = new Discord.Client();
 
 async function updateMessage(classes, assignments) {
-	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
+	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + curtime.format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
 	var embedObj = JSON.parse(embedString);
 
 	Object.keys(classes).forEach(function(keyCl) {
@@ -46,7 +46,7 @@ async function updateMessage(classes, assignments) {
 		Object.keys(assignments).forEach(function(keyAsn) {
 			const rowAsn = assignments[keyAsn];
 			if (rowAsn.classID == rowCl.classID) {
-				if (moment(rowAsn.dueDate).isBefore() && moment(rowAsn.dueDate).diff(moment(), 'weeks') < 2) {
+				if (moment(rowAsn.dueDate).isBefore() && moment(rowAsn.dueDate).diff(curtime, 'weeks') < 2) {
 					assignmentsLateString += '- ' + rowAsn.assignmentName + ' `' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ')`\n';
 				}
 			}
@@ -78,7 +78,7 @@ async function updateMessage(classes, assignments) {
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isAfter()) {
 					assignmentsString += '- ' +
-						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? '⌛' : '') : 'Weekly') + '`\n';
+						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(curtime, 'days') < 2) ? '⌛' : '') : 'Weekly') + '`\n';
 				}
 			}
 		});
