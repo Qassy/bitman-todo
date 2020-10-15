@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
 moment().tz('America/Vancouver').format();
+moment.tz.setDefault('America/Vancouver');
 const curtime = moment().tz('America/Vancouver');
 
 async function pullQuery() {
@@ -38,7 +39,7 @@ async function pullQuery() {
 const client = new Discord.Client();
 
 async function updateMessage(classes, assignments) {
-	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + curtime.format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
+	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
 	var embedObj = JSON.parse(embedString);
 
 	Object.keys(classes).forEach(function(keyCl) {
