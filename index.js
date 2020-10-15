@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const mysql = require('mysql');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const config = require('./config.json');
 moment().tz('America/Vancouver').format();
 
