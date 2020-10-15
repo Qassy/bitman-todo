@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
+moment().tz('America/Vancouver').format();
 const curtime = moment().tz('America/Vancouver');
 
 async function pullQuery() {
