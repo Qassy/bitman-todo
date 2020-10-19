@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
+const timerShort = '⌛';
 moment().tz('America/Vancouver').format();
 moment.tz.setDefault('America/Vancouver');
 
@@ -79,7 +80,8 @@ async function updateMessage(classes, assignments) {
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isAfter()) {
 					assignmentsString += '- ' +
-						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? '⌛' : '') : 'Weekly') + '`\n';
+						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '') : 'Weekly (' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ')' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '')) + '`\n';
+					//console.log(moment().day(moment(rowAsn.dueDate).day()).fromNow());
 				}
 			}
 		});
@@ -121,7 +123,6 @@ function loop() {
 	if (active == true) {
 		setTimeout(function() {
 			pullQuery();
-			loop();
 		}, 60000);
 	}
 }
