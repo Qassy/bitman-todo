@@ -80,8 +80,8 @@ async function updateMessage(classes, assignments) {
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isAfter()) {
 					assignmentsString += '- ' +
-						rowAsn.assignmentName + ' `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '') : 'Weekly (' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ')' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '')) + '`\n';
-					//console.log(moment().day(moment(rowAsn.dueDate).day()).fromNow());
+						rowAsn.assignmentName + ' ` ' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '') : 'Weekly (' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ') ' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days') < 2) ? timerShort : '')) + '`\n';
+					//console.log(moment().day(rowAsn.dueDate));
 				}
 			}
 		});
