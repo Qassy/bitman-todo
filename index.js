@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
+const pjson = require('./package.json');
 const timerShort = '⌛';
 moment().tz('America/Vancouver').format();
 moment.tz.setDefault('America/Vancouver');
@@ -39,7 +40,7 @@ async function pullQuery() {
 const client = new Discord.Client();
 
 async function updateMessage(classes, assignments) {
-	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + config.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
+	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "To-do list updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + pjson.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
 	var embedObj = JSON.parse(embedString);
 
 	Object.keys(classes).forEach(function(keyCl) {
@@ -79,9 +80,7 @@ async function updateMessage(classes, assignments) {
 			const rowAsn = assignments[keyAsn];
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isAfter()) {
-					assignmentsString += '- ' +
-						rowAsn.assignmentName + ' ` ' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '') : 'Weekly (' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ') ' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days') < 2) ? timerShort : '')) + '`\n';
-					//console.log(moment().day(rowAsn.dueDate));
+					assignmentsString += '- ' + rowAsn.assignmentName + '  ` ' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + ((moment(rowAsn.dueDate).diff(moment(), 'days') < 2) ? timerShort : '') : 'Weekly (' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ') ' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days') < 2) ? timerShort : '')) + '`\n';
 				}
 			}
 		});
@@ -117,12 +116,19 @@ client.once('ready', () => {
 	loop();
 });
 
+client.on('disconnect', function(msg, code) {
+	if (code === 0) return console.error(msg);
+	client.connect();
+});
+
 let active = true;
 
 function loop() {
 	if (active == true) {
 		setTimeout(function() {
 			pullQuery();
+			loop();
+			//console.log('working');
 		}, 60000);
 	}
 }
