@@ -127,7 +127,7 @@ async function updateMessage(classes, assignments) {
 						}
 					}
 
-					if (assignmentDueDateDiff <= 96) {
+					if (assignmentDueDateDiff <= 42) {
 						dueTimer = '⌛ ';
 					} else {
 						dueTimer = '';
