@@ -73,7 +73,7 @@ async function updateMessage(classes, assignments) {
 		Object.keys(assignments).forEach(function(keyAsn) {
 			const rowAsn = assignments[keyAsn];
 			if (rowAsn.classID == rowCl.classID) {
-				if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 7) {
+				if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 14) {
 					assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') `\n';
 				}
 			}
