@@ -48,13 +48,26 @@ const client = new Discord.Client();
 async function updateBot(configs) {
 	Object.keys(configs).forEach(function(keyConf) {
 		const rowConf = configs[keyConf];
+		var motdEnable = 'on';
 
 		switch (rowConf.variable) {
 			case 'motd':
-				client.user.setActivity(rowConf.value, { type: configs[1].value });
+				if (motdEnable == 'on') {
+					client.user.setActivity(rowConf.value, { type: configs[1].value });
+				}
 				break;
 			case 'motdType':
 				// taken care in the "motd" case
+				break;
+			case 'motdEnable':
+				// motdEnable = rowConf.value;
+				// tbd
+				break;
+			case 'avatarURL':
+				if (moment().tz('America/Vancouver').diff(rowConf.lastModified, 'seconds') + 10800 <= 60) {
+					client.user.setAvatar(rowConf.value);
+					//console.log('setting pic');
+				}
 				break;
 			default:
 				console.log('Could not find function for setting ' + rowConf.variable);
