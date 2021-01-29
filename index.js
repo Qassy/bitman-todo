@@ -87,7 +87,14 @@ async function updateMessage(classes, assignments) {
 			const rowAsn = assignments[keyAsn];
 			if (rowAsn.classID == rowCl.classID) {
 				if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 14) {
-					assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') `\n';
+
+					var lateSymbol = '';
+
+					if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'hours') <= 24) {
+						lateSymbol = '👎 ';
+					}
+
+					assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + lateSymbol + '`\n';
 				}
 			}
 		});
@@ -140,13 +147,28 @@ async function updateMessage(classes, assignments) {
 						}
 					}
 
-					if (assignmentDueDateDiff <= 42) {
+					if (assignmentDueDateDiff <= 48) {
 						dueTimer = '⌛ ';
 					} else {
 						dueTimer = '';
 					}
 
-					assignmentsString += '- ' + rowAsn.assignmentName + ' ` ' + assignmentDueDate + ' (' + assignmentDueDateDiffFormat + ') ' + dueTimer + '`\n';
+					var assignmentPublishDate = rowAsn.showDate;
+					var assignmentPublishDateDiff = moment(assignmentPublishDate).diff(moment(), 'hours');
+					var assignmentLastModified = rowAsn.lastModified;
+					var assignmentLastModifiedDiff = moment(assignmentLastModified).diff(moment(), 'hours');
+
+					var newSymbol = '';
+					var updateSymbol = '';
+
+					if (assignmentPublishDateDiff >= -24) {
+						newSymbol = ':new: ';
+					} else if (assignmentLastModifiedDiff >= -24) {
+						updateSymbol = ':mega: ';
+
+					}
+
+					assignmentsString += '- ' + newSymbol + updateSymbol + rowAsn.assignmentName + ' ` ' + assignmentDueDate + ' (' + assignmentDueDateDiffFormat + ') ' + dueTimer + '`\n';
 
 					// assignmentsString += '- ' + rowAsn.assignmentName + '  `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM - Do h: mma ') + ' (' + moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow() + ')' + ((moment(rowAsn.dueDate).diff(moment(), 'days ') < 2) ? timerShort : '') : 'Weekly(' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ')' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days ') < 2) ? timerShort : '')) + '`\n';
 				}
@@ -160,6 +182,24 @@ async function updateMessage(classes, assignments) {
 			value: assignmentsString,
 		});
 	});
+
+	embedObj['fields'].push({
+		name: '\u200B',
+		value: '\u200B',
+	});
+
+	var legendString = '';
+	legendString += '`⌛` - Homework is **due** within the next 48 hours.\n';
+	legendString += ':new: - **New** homework was assigned within the last 24 hours.\n';
+	legendString += ':mega: - Homework was **updated** within the last 24 hours.\n';
+	legendString += '`👎` - Homework has been **late** within the last 24 hours.\n ';
+	legendString += '\u200B';
+
+	embedObj['fields'].push({
+		name: '>  **Legend**   ',
+		value: legendString,
+	});
+
 
 	embedString = JSON.stringify(embedObj);
 
