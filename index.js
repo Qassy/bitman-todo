@@ -77,7 +77,7 @@ async function updateBot(configs) {
 }
 
 async function updateMessage(classes, assignments) {
-	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mm:ssa') + '  •  BITMAN Task Manager: v' + pjson.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
+	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + pjson.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
 	var embedObj = JSON.parse(embedString);
 
 	Object.keys(classes).forEach(function(keyCl) {
