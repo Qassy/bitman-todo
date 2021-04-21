@@ -1,6 +1,6 @@
 {
 	"name": "bitman-todo",
-	"version": "1.08.0",
+	"version": "1.09.0",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
