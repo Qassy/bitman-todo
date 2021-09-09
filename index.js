@@ -3,8 +3,16 @@ const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
 const pjson = require('./package.json');
-moment().tz('America/Vancouver').format();
-moment.tz.setDefault('America/Vancouver');
+var tz = moment.tz.guess();
+moment().tz(tz).format();
+moment.tz.setDefault(tz);
+
+var showPastAssignments = 'off';
+var showFutureAssignments = 'off';
+var showLegend = 'off';
+var showCustom = 'off';
+var customHeader = '\u200B';
+var customString = '\u200B';
 
 async function pullQuery() {
 	let con = mysql.createConnection({
@@ -69,6 +77,31 @@ async function updateBot(configs) {
 					//console.log('setting pic');
 				}
 				break;
+
+			case 'showPastAssignments':
+				showPastAssignments = rowConf.value;
+				break;
+
+			case 'showFutureAssignments':
+				showFutureAssignments = rowConf.value;
+				break;
+
+			case 'showLegend':
+				showLegend = rowConf.value;
+				break;
+
+			case 'showCustom':
+				showCustom = rowConf.value;
+				break;
+
+			case 'customHeader':
+				customHeader = rowConf.value;
+				break;
+
+			case 'customString':
+				customString = rowConf.value;
+				break;
+
 			default:
 				console.log('Could not find function for setting ' + rowConf.variable);
 		}
@@ -77,129 +110,168 @@ async function updateBot(configs) {
 }
 
 async function updateMessage(classes, assignments) {
-	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BITMAN Task Manager: v' + pjson.version + '"}, "fields": [{"name": "> :arrow_down:  **Past Homework**  :arrow_down: ", "value": "\u200B"}]}';
+	var embedString = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BAIST TODO: v' + pjson.version + '"}, "fields": []}';
+
 	var embedObj = JSON.parse(embedString);
 
-	Object.keys(classes).forEach(function(keyCl) {
-		const rowCl = classes[keyCl];
-		var assignmentsLateString = '\u200B';
-		Object.keys(assignments).forEach(function(keyAsn) {
-			const rowAsn = assignments[keyAsn];
-			if (rowAsn.classID == rowCl.classID) {
-				if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 14) {
-
-					var lateSymbol = '';
-
-					if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'hours') <= 24) {
-						lateSymbol = '👎 ';
-					}
-
-					assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + lateSymbol + '`\n';
-				}
-			}
-		});
-
-		assignmentsLateString += '\u200B';
+	if (showPastAssignments == 'on') {
 
 		embedObj['fields'].push({
-			name: rowCl.classID,
-			value: assignmentsLateString,
+			name: '> :arrow_down:  **Past Homework**  :arrow_down: ',
+			value: '\u200B',
 		});
-	});
 
-	embedObj['fields'].push({
-		name: '\u200B',
-		value: '\u200B',
-	});
+		Object.keys(classes).forEach(function(keyCl) {
+			const rowCl = classes[keyCl];
+			var assignmentsLateString = '\u200B';
+			Object.keys(assignments).forEach(function(keyAsn) {
+				const rowAsn = assignments[keyAsn];
+				if (rowAsn.classID == rowCl.classID) {
+					if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 14) {
 
-	embedObj['fields'].push({
-		name: '> :arrow_down:  **Due Homework**  :arrow_down: ',
-		value: '\u200B',
-	});
+						var lateSymbol = '';
 
-	Object.keys(classes).forEach(function(keyCl) {
-		const rowCl = classes[keyCl];
-		var assignmentsString = '\u200B';
-		Object.keys(assignments).forEach(function(keyAsn) {
-			const rowAsn = assignments[keyAsn];
-			if (rowAsn.classID == rowCl.classID) {
-				if (moment(rowAsn.dueDate).isAfter() && moment(rowAsn.showDate).isBefore()) {
-
-					var assignmentDueDate = '';
-					var assignmentDueDateDiff = moment(rowAsn.dueDate).diff(moment(), 'hours');
-					var assignmentDueDateDiffFormat = '';
-					var dueTimer = '';
-
-					if (rowAsn.isRecurring == 0) {
-						assignmentDueDate = moment(rowAsn.dueDate).format('MMM-Do h:mma');
-						assignmentDueDateDiffFormat = moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow();
-					} else {
-						assignmentDueDate = 'Weekly';
-
-						var assignmentDueDateDay = moment().day(moment(rowAsn.dueDate).day());
-
-						if (moment() <= assignmentDueDateDay) {
-							assignmentDueDateDiffFormat = moment(assignmentDueDateDay).fromNow();
-							// a date in the current week
-						} else {
-							assignmentDueDateDiffFormat = moment(assignmentDueDateDay).add(1, 'weeks').fromNow();
-							// a date in the previous week
+						if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'hours') <= 24) {
+							lateSymbol = '👎 ';
 						}
+
+						assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + lateSymbol + '`\n';
 					}
-
-					if (assignmentDueDateDiff <= 48) {
-						dueTimer = '⌛ ';
-					} else {
-						dueTimer = '';
-					}
-
-					var assignmentPublishDate = rowAsn.showDate;
-					var assignmentPublishDateDiff = moment(assignmentPublishDate).diff(moment(), 'hours');
-					var assignmentLastModified = rowAsn.lastModified;
-					var assignmentLastModifiedDiff = moment(assignmentLastModified).diff(moment(), 'hours');
-
-					var newSymbol = '';
-					var updateSymbol = '';
-
-					if (assignmentPublishDateDiff >= -24) {
-						newSymbol = ':new: ';
-					} else if (assignmentLastModifiedDiff >= -24) {
-						updateSymbol = ':mega: ';
-
-					}
-
-					assignmentsString += '- ' + newSymbol + updateSymbol + rowAsn.assignmentName + ' ` ' + assignmentDueDate + ' (' + assignmentDueDateDiffFormat + ') ' + dueTimer + '`\n';
-
-					// assignmentsString += '- ' + rowAsn.assignmentName + '  `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM - Do h: mma ') + ' (' + moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow() + ')' + ((moment(rowAsn.dueDate).diff(moment(), 'days ') < 2) ? timerShort : '') : 'Weekly(' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ')' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days ') < 2) ? timerShort : '')) + '`\n';
 				}
-			}
-		});
+			});
 
-		assignmentsString += '\u200B';
+			assignmentsLateString += '\u200B';
+
+			embedObj['fields'].push({
+				name: rowCl.classID,
+				value: assignmentsLateString,
+			});
+		});
 
 		embedObj['fields'].push({
-			name: rowCl.classID,
-			value: assignmentsString,
+			name: '\u200B',
+			value: '\u200B',
 		});
-	});
+	}
 
-	embedObj['fields'].push({
-		name: '\u200B',
-		value: '\u200B',
-	});
+	if (showFutureAssignments == 'on') {
 
-	var legendString = '';
-	legendString += '`⌛` - Homework is **due** within the next 48 hours.\n';
-	legendString += ':new: - **New** homework was assigned within the last 24 hours.\n';
-	legendString += ':mega: - Homework was **updated** within the last 24 hours.\n';
-	legendString += '`👎` - Homework has been **late** within the last 24 hours.\n ';
-	legendString += '\u200B';
+		embedObj['fields'].push({
+			name: '> :arrow_down:  **Due Homework**  :arrow_down: ',
+			value: '\u200B',
+		});
 
-	embedObj['fields'].push({
-		name: '>  **Legend**   ',
-		value: legendString,
-	});
+		Object.keys(classes).forEach(function(keyCl) {
+			const rowCl = classes[keyCl];
+			var assignmentsString = '\u200B';
+			Object.keys(assignments).forEach(function(keyAsn) {
+				const rowAsn = assignments[keyAsn];
+				if (rowAsn.classID == rowCl.classID) {
+					if (moment(rowAsn.dueDate).isAfter() && moment(rowAsn.showDate).isBefore()) {
 
+						var assignmentDueDate = '';
+						var assignmentDueDateDiff = moment(rowAsn.dueDate).diff(moment(), 'hours');
+						var assignmentDueDateDiffFormat = '';
+						var dueTimer = '';
+
+						if (rowAsn.isRecurring == 0) {
+							assignmentDueDate = moment(rowAsn.dueDate).format('MMM-Do h:mma');
+							assignmentDueDateDiffFormat = moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow();
+						} else {
+							assignmentDueDate = 'Weekly';
+
+							var assignmentDueDateDay = moment().day(moment(rowAsn.dueDate).day());
+
+							if (moment() <= assignmentDueDateDay) {
+								assignmentDueDateDiffFormat = moment(assignmentDueDateDay).fromNow();
+								// a date in the current week
+							} else {
+								assignmentDueDateDiffFormat = moment(assignmentDueDateDay).add(1, 'weeks').fromNow();
+								// a date in the previous week
+							}
+						}
+
+						if (assignmentDueDateDiff <= 48) {
+							dueTimer = '⌛ ';
+						} else {
+							dueTimer = '';
+						}
+
+						var assignmentPublishDate = rowAsn.showDate;
+						var assignmentPublishDateDiff = moment(assignmentPublishDate).diff(moment(), 'hours');
+						var assignmentLastModified = rowAsn.lastModified;
+						var assignmentLastModifiedDiff = moment(assignmentLastModified).diff(moment(), 'hours');
+
+						var newSymbol = '';
+						var updateSymbol = '';
+
+						if (assignmentPublishDateDiff >= -24) {
+							newSymbol = ':new: ';
+						} else if (assignmentLastModifiedDiff >= -24) {
+							updateSymbol = ':mega: ';
+
+						}
+
+						assignmentsString += '- ' + newSymbol + updateSymbol + rowAsn.assignmentName + ' ` ' + assignmentDueDate + ' (' + assignmentDueDateDiffFormat + ') ' + dueTimer + '`\n';
+
+						// assignmentsString += '- ' + rowAsn.assignmentName + '  `' + ((rowAsn.isRecurring == 0) ? moment(rowAsn.dueDate).format('MMM - Do h: mma ') + ' (' + moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow() + ')' + ((moment(rowAsn.dueDate).diff(moment(), 'days ') < 2) ? timerShort : '') : 'Weekly(' + moment().day(moment(rowAsn.dueDate).day()).fromNow() + ')' + ((moment().day(moment(rowAsn.dueDate).day()).diff(moment(), 'days ') < 2) ? timerShort : '')) + '`\n';
+					}
+				}
+			});
+
+			assignmentsString += '\u200B';
+
+			embedObj['fields'].push({
+				name: rowCl.classID,
+				value: assignmentsString,
+			});
+		});
+
+		embedObj['fields'].push({
+			name: '\u200B',
+			value: '\u200B',
+		});
+	}
+
+	if (showLegend == 'on') {
+
+		var legendString = '';
+
+		if (showFutureAssignments == 'on') {
+			legendString += '`⌛` - Homework is **due** within the next 48 hours.\n';
+			legendString += ':new: - **New** homework was assigned within the last 24 hours.\n';
+			legendString += ':mega: - Homework was **updated** within the last 24 hours.\n';
+		}
+
+		if (showPastAssignments == 'on') {
+			legendString += '`👎` - Homework has been **late** within the last 24 hours.\n ';
+		}
+
+		legendString += '\u200B';
+
+		embedObj['fields'].push({
+			name: '>  **Legend**   ',
+			value: legendString,
+		});
+	}
+
+	if (showCustom == 'on') {
+
+		if (showPastAssignments == 'on' || showFutureAssignments == 'on') {
+
+			embedObj['fields'].push({
+				name: '\u200B',
+				value: '\u200B',
+			});
+		}
+
+		customString += '\u200B';
+
+		embedObj['fields'].push({
+			name: customHeader,
+			value: customString,
+		});
+	}
 
 	embedString = JSON.stringify(embedObj);
 
@@ -217,9 +289,8 @@ async function updateMessage(classes, assignments) {
 
 client.once('ready', () => {
 	console.log('Ready!');
-	//const channel = client.channels.cache.get('754007715335897119');
+	//const channel = client.channels.cache.get('885537638155710555');
 	//channel.send('beep boop task list goes here');
-	pullQuery();
 	loop();
 });
 
@@ -232,8 +303,8 @@ let active = true;
 
 function loop() {
 	if (active == true) {
+		pullQuery();
 		setTimeout(function() {
-			pullQuery();
 			loop();
 			//console.log('working');
 		}, 60000);
@@ -241,4 +312,5 @@ function loop() {
 }
 
 // login client to discord
+client.login(config.token);
 client.login(config.token);
