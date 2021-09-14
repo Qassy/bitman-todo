@@ -46,11 +46,11 @@ function pullQuery() {
 			updateBot(configs);
 		});
 
-		con.query(sqlCS, function(err, resultCS, fields) {
-			if (err) throw err;
-			classSchedule = resultCS;
-			updateSchedule(classSchedule);
-		});
+		//	con.query(sqlCS, function(err, resultCS, fields) {
+		// if (err) throw err;
+		// classSchedule = resultCS;
+		// updateSchedule(classSchedule);
+		// });
 
 		con.query(sqlC, function(err, resultC, fields) {
 			if (err) throw err;
