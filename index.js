@@ -381,7 +381,7 @@ function loop() {
 		setTimeout(function() {
 			loop();
 			//console.log('working');
-		}, 300000);
+		}, 600000);
 	}
 }
 
