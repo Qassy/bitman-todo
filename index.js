@@ -44,6 +44,7 @@ function pullQuery() {
 			if (err) throw err;
 			configs = resultS;
 			updateBot(configs);
+			con.end();
 		});
 
 		//	con.query(sqlCS, function(err, resultCS, fields) {
@@ -55,11 +56,12 @@ function pullQuery() {
 		con.query(sqlC, function(err, resultC, fields) {
 			if (err) throw err;
 			classes = resultC;
-
+			con.end();
 			con.query(sqlA, function(err, resultA, fields) {
 				if (err) throw err;
 				assignments = resultA;
 				updateMessage(classes, assignments);
+				con.end();
 			});
 
 		});
@@ -381,7 +383,7 @@ function loop() {
 		setTimeout(function() {
 			loop();
 			//console.log('working');
-		}, 600000);
+		}, 60000);
 	}
 }
 
