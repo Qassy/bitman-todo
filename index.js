@@ -16,9 +16,7 @@ var customHeader = '\u200B';
 var customString = '\u200B';
 var showShedule = 'on';
 
-var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
-
-function pullQuery() {
+async function pullQuery() {
 	let con = mysql.createConnection({
 		host: config.sqlhost,
 		user: config.sqluser,
@@ -40,13 +38,6 @@ function pullQuery() {
 		var classes = '';
 		var assignments = '';
 
-		con.query(sqlS, function(err, resultS, fields) {
-			if (err) throw err;
-			configs = resultS;
-			updateBot(configs);
-			con.end();
-		});
-
 		//	con.query(sqlCS, function(err, resultCS, fields) {
 		// if (err) throw err;
 		// classSchedule = resultCS;
@@ -56,14 +47,19 @@ function pullQuery() {
 		con.query(sqlC, function(err, resultC, fields) {
 			if (err) throw err;
 			classes = resultC;
-			con.end();
+
 			con.query(sqlA, function(err, resultA, fields) {
 				if (err) throw err;
 				assignments = resultA;
 				updateMessage(classes, assignments);
-				con.end();
-			});
 
+				con.query(sqlS, function(err, resultS, fields) {
+					if (err) throw err;
+					configs = resultS;
+					updateBot(configs);
+					con.end();
+				});
+			});
 		});
 	});
 }
@@ -127,6 +123,9 @@ async function updateBot(configs) {
 }
 
 async function updateMessage(classes, assignments) {
+
+	var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
+
 	var embedString = embedHeader;
 
 	var embedObj = JSON.parse(embedString);
@@ -388,5 +387,4 @@ function loop() {
 }
 
 // login client to discord
-client.login(config.token);
 client.login(config.token);
