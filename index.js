@@ -64,7 +64,8 @@ async function pullQuery() {
 	});
 }
 
-const client = new Discord.Client();
+//const client = new Discord.Client();
+const client = new Discord.Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] });
 
 async function updateBot(configs) {
 	Object.keys(configs).forEach(function(keyConf) {
@@ -296,11 +297,16 @@ async function updateMessage(classes, assignments) {
 	});
 
 	const embed = embedObj;
-	const channel = client.channels.cache.get(config.listchannelid);
+	const embedChannel = client.channels.cache.get(config.listchannelid);
+	const embedMessage = embedChannel.messages.fetch(config.listmsgid);
 
-	channel.messages.fetch(config.listmsgid)
-		.then(msg => msg.edit('', { embed }))
+	embedChannel.messages.fetch(config.listmsgid)
+		.then(msg => msg.edit({ embeds: [embed] }))
 		.catch(console.error);
+
+	//embedMessage.edit('test');
+
+	//console.log('we made it: ' + { embed });
 }
 
 function updateSchedule(schedule) {
@@ -385,6 +391,17 @@ function loop() {
 		}, 60000);
 	}
 }
+
+client.on('messageCreate', message => {
+	if (message.author.bot) return false;
+
+	if (message.content.includes('@here') || message.content.includes('@everyone')) return false;
+
+	if (message.mentions.has(client.user.id)) {
+		message.react('👀');
+		//message.reply('fuck you');
+	}
+});
 
 // login client to discord
 client.login(config.token);
