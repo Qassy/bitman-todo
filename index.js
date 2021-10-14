@@ -3,14 +3,14 @@ const mysql = require('mysql');
 const moment = require('moment-timezone');
 const config = require('./config.json');
 const pjson = require('./package.json');
-var tz = 'America/Edmonton';
+var tz = 'America/Winnipeg';
 moment().tz(tz).format();
 moment.tz.setDefault(tz);
 
 
-var showPastAssignments = 'off';
-var showFutureAssignments = 'off';
-var showLegend = 'off';
+var showPastAssignments = 'on';
+var showFutureAssignments = 'on';
+var showLegend = 'on';
 var showCustom = 'off';
 var customHeader = '\u200B';
 var customString = '\u200B';
@@ -125,7 +125,7 @@ async function updateBot(configs) {
 
 async function updateMessage(classes, assignments) {
 
-	var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-Do h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
+	var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-D h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
 
 	var embedString = embedHeader;
 
@@ -134,25 +134,24 @@ async function updateMessage(classes, assignments) {
 	if (showPastAssignments == 'on') {
 
 		embedObj['fields'].push({
-			name: '> :arrow_down:  **Past Homework**  :arrow_down: ',
+			name: '> :arrow_down:  **Past Homework (in the last 7 days)**  :arrow_down: ',
 			value: '\u200B',
 		});
 
 		Object.keys(classes).forEach(function(keyCl) {
 			const rowCl = classes[keyCl];
-			var assignmentsLateString = '\u200B';
+			var assignmentsLateString = '';
 			Object.keys(assignments).forEach(function(keyAsn) {
 				const rowAsn = assignments[keyAsn];
 				if (rowAsn.classID == rowCl.classID) {
-					if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 14) {
+					if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'days') <= 7) {
 
 						var lateSymbol = '';
 
 						if (moment(rowAsn.dueDate).isBefore() && moment().diff(moment(rowAsn.dueDate), 'hours') <= 24) {
 							lateSymbol = '👎 ';
 						}
-
-						assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-Do h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + lateSymbol + '`\n';
+						assignmentsLateString += '- ' + rowAsn.assignmentName + ' ` ' + moment(rowAsn.dueDate).format('MMM-D h:mma') + ' (' + moment(rowAsn.dueDate, 'YYY-MM-DD hh:mm:ss').fromNow() + ') ' + lateSymbol + '`\n';
 					}
 				}
 			});
@@ -180,7 +179,7 @@ async function updateMessage(classes, assignments) {
 
 		Object.keys(classes).forEach(function(keyCl) {
 			const rowCl = classes[keyCl];
-			var assignmentsString = '\u200B';
+			var assignmentsString = '';
 			Object.keys(assignments).forEach(function(keyAsn) {
 				const rowAsn = assignments[keyAsn];
 				if (rowAsn.classID == rowCl.classID) {
@@ -192,7 +191,7 @@ async function updateMessage(classes, assignments) {
 						var dueTimer = '';
 
 						if (rowAsn.isRecurring == 0) {
-							assignmentDueDate = moment(rowAsn.dueDate).format('MMM-Do h:mma');
+							assignmentDueDate = moment(rowAsn.dueDate).format('MMM-D h:mma');
 							assignmentDueDateDiffFormat = moment(rowAsn.dueDate, 'YYY - MM - DD hh: mm: ss ').fromNow();
 						} else {
 							assignmentDueDate = 'Weekly';
@@ -397,7 +396,7 @@ client.on('messageCreate', message => {
 
 	if (message.content.includes('@here') || message.content.includes('@everyone')) return false;
 
-	if (message.mentions.has(client.user.id)) {
+	if (message.mentions.has(client.user.id || config.listchannelid)) {
 		message.react('👀');
 		//message.reply('fuck you');
 	}
