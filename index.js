@@ -125,7 +125,7 @@ async function updateBot(configs) {
 
 async function updateMessage(classes, assignments) {
 
-	var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().format('MMM-D h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
+	var embedHeader = '{"color": ' + Math.floor(Math.random() * 16777215) + ', "footer": {"text": "Updated: ' + moment().tz('America/Edmonton').format('MMM-D h:mma') + '  •  BAIST BOT: v' + pjson.version + '"}, "fields": []}';
 
 	var embedString = embedHeader;
 
