@@ -263,7 +263,7 @@ async function updateMessage(classes, assignments) {
 			legendString += '`👎` - Homework has been **late** within the last 24 hours.\n';
 		}
 
-		legendString += ':NEW: https://qass.co/baist/ \n';
+		legendString += '\n :new: https://qass.co/baist/ :link: \n';
 
 		legendString += '\u200B';
 
