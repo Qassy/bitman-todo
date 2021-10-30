@@ -260,8 +260,10 @@ async function updateMessage(classes, assignments) {
 		}
 
 		if (showPastAssignments == 'on') {
-			legendString += '`👎` - Homework has been **late** within the last 24 hours.\n ';
+			legendString += '`👎` - Homework has been **late** within the last 24 hours.\n';
 		}
+
+		legendString += ':NEW: https://qass.co/baist/ \n';
 
 		legendString += '\u200B';
 
